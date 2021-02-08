@@ -3,6 +3,7 @@ before_script:
   - gulp
 node_js:
  - 12
+ - 14
 after_script:
   - tsc
   - npm run coveralls
