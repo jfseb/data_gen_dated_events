@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+       "skipLibCheck": true, // avoid lodash WeakMap mismatch
+       "target": "es2017",
+       "module": "commonjs",
+       "moduleResolution": "node",
+       "isolatedModules": false,
+       "experimentalDecorators": true,
+       "emitDecoratorMetadata": true,
+       "declaration": true, // TODO TRUE
+       "noImplicitAny": false,
+       "removeComments": false,
+       "noLib": false,
+       "outDir" : "js",
+       "sourceMap" : false,
+       "inlineSourceMap": true,
+       "preserveConstEnums": true,
+       "suppressImplicitAnyIndexErrors": true
+    },
+    "filesGlob": [
+     	//   "**/*.ts",
+        "**/*.tsx",
+        "!node_modules/**"
+    ],
+    "files": [
+        "src/index.ts",
+        "src/helpers.ts",
+    ],
+    "exclude": [
+    ]
+}

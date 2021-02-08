@@ -1,0 +1,59 @@
+{
+  "name": "gendata",
+  "version": "1.0.0",
+  "description": "generate data",
+  "main": "js/index.js",
+  "typings": "js/index.d.ts",
+  "scripts": {
+    "test": "gulp test",
+    "build": "gulp && tsc",
+    "prestart": "npm run build",
+    "run": "node js\\index.js",
+    "start": "node js\\index.js",
+    "coverage": "jest --coverage",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
+  },
+  "author": "",
+  "license": "ISC",
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true,
+    "testTimeout": 1200,
+    "testPathIgnorePatterns": [
+      "node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "src/*.{ts,js}",
+      "js/*.js",
+      "js/**/{!(elizabot.js),}.js"
+    ],
+    "coveragePathIgnorePatterns": [],
+    "transform": {
+      "\\.[tj]sx?$": "babel-jest"
+    }
+  },
+  "dependencies": {
+    "@js-joda/core": "^3.2.0",
+    "moment": "^2.29.1",
+    "seedrandom": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/lodash": "^4.14.161",
+    "@types/node": "^8.10.64",
+    "babel-jest": "^26.6.3",
+    "coveralls": "^3.0.7",
+    "eslint-plugin-jest": "^24.1.0",
+    "gulp": "^4.0.2",
+    "gulp-env": "^0.4.0",
+    "gulp-eslint": "^6.0.0",
+    "gulp-jest": "https://registry.npmjs.org/@jacobq/gulp-jest/-/gulp-jest-4.0.3-PR65.tgz",
+    "gulp-jsdoc3": "^2.0.0",
+    "gulp-run": "^1.7.1",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-typescript": "^5.0.1",
+    "gulp-watch": "^5.0.1",
+    "jest": "^26.5.2",
+    "typescript": "^4.1.3"
+  }
+}
