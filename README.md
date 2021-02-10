@@ -1,6 +1,9 @@
 # data_gen_dated_events
 # t [![Build Status](https://travis-ci.org/jfseb/data_gen_dated_events.svg?branch=main)](https://travis-ci.org/jfseb/data_gen_dated_events)[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
 
+[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
+
+
 Sample Data Generator for date events, e.g. HR Data
 
 This currently generates a sparse "hired values only" data with just two dimensions User, Location, FTE and a set of aggregates and hire state toggled (on off)

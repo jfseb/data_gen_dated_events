@@ -2,16 +2,34 @@ export declare const EXCELOFFSET = 25569;
 import { LocalDate } from "@js-joda/core";
 export declare function dateToDayIndex(d: LocalDate): number;
 export declare function makeMap(obj: any): any[];
+export declare class WSWrap {
+    ws: any;
+    constructor(fn: string);
+    write(a: any): this;
+}
+export declare function getWS(filename: string): WSWrap;
+export declare class OptsMONAG {
+    noZero: boolean;
+    stopRecords: boolean;
+}
 export declare class GenParams {
     AVG_NEXT: number;
     LOCCHANGE: number;
     FTECHANGE: number;
+    ESTATCHANGE: number;
     L_HIRE: number;
     L_EVENT: number;
-    locations: string[];
+    LOCATIONs: string[];
+    ESTATs: string[];
     firstDate: LocalDate;
     lastDate: LocalDate;
     random: any;
+    wsMONAG: any;
+    optsMONAG?: OptsMONAG;
+    wsRANGE: any;
+    optsRANGE: any;
+    randomOD: any;
+    REOP_ESTATS: string[];
 }
 export declare class Person {
     user: string;
@@ -23,21 +41,25 @@ export declare class Person {
     fte: number;
     ftePrev: number;
     fteSOM: number;
+    ESTAT: string;
+    ESTATPrev: string;
+    ESTATSOM: string;
     lastHired: LocalDate;
-    lastRecorded: LocalDate;
     prevDateEnd: LocalDate;
+    prevRangeEnd: LocalDate;
 }
 export declare function dateIndexToDate(dateIdx: number): LocalDate;
 export declare function copyDate(d: LocalDate): LocalDate;
 export declare function isEOQ(d: LocalDate): boolean;
 export declare function isEOY(d: LocalDate): boolean;
-export declare function pad(a: any, len: number): string;
+export declare function padZeros(a: any, len: number): string;
 export declare function padSpace(a: any, len: number): string;
 export declare function padSpaceQ(a: any, len: number): string;
 export declare function asDate(dateIdx: any): string;
 export declare function EOMONTH(d: LocalDate): LocalDate;
 export declare function daysInMonth(d: any): number;
 export declare function writeHeader(ws: any): void;
+export declare function makeQuarter(d: LocalDate): string;
 export declare function writeDay(ws: any, prevDateEnd: LocalDate, dateIdx: LocalDate): number;
 export declare function diffYears(dateLow: LocalDate, dateHigh: LocalDate): number;
 export declare function diffMonth(dateLow: LocalDate, dateHigh: LocalDate): number;
@@ -47,7 +69,27 @@ export declare function getSOM(dateIdx: LocalDate): LocalDate;
 export declare function writeAge(ws: any, now: LocalDate, pers: any, eom: boolean): void;
 export declare function writeTripel(ws: any, vsom: any, vnow: any, eom: boolean): void;
 export declare function toDec1(n: number): string;
-export declare function memorizeSOM(eom: boolean, pers: Person): void;
-export declare function writeRecord(ws: any, dateIdx: LocalDate, pers: Person, comment: string): void;
+export declare function memorizeSOM(dateIdx: LocalDate, pers: Person): void;
+/**
+ * This function does mutate pers, use a clone if not desired!
+ * @param ws
+ * @param dateIdx
+ * @param pers
+ * @param comment
+ */
+export declare function writeRecord(ws: any, dateIdx: LocalDate, pers: Person, pars: GenParams, comment: string): void;
+/**
+ * This function does mutate pers, use a clone if not desired!
+ * @param ws
+ * @param dateIdx
+ * @param pers
+ * @param comment
+ */
+export declare function writeRecord0(ws: any, dateIdx: LocalDate, pers: Person, comment: string): void;
 export declare function isHireChange(pars: GenParams): boolean;
-export declare function genPerson(ws: any, p: any, pars: GenParams): void;
+export declare function genPerson(p: any, pars: GenParams): void;
+export declare function getMaxPrimes(nr: number): number;
+export declare function genUSERHierarchy(nrpers: number): void;
+export declare function cleanseWSInFile(filename1: string, filename2: string): void;
+export declare function genUser(i: number): string;
+export declare function genUSERHierarchyW(ws: any, nrpers: number): void;
