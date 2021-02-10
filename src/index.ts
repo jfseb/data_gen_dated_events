@@ -113,11 +113,15 @@ for(var p = 1; p < NRPERS; ++p) {
 
 pars.wsMONAG.ws.on('finish', () => {
   console.log('Wrote data to file ' + FILENAME_MONAG );
-  Helpers.cleanseWSInFile(FILENAME_MONAG, FILENAME_MONAG_C);
+  Helpers.cleanseWSInFile(FILENAME_MONAG, FILENAME_MONAG_C, function() {
+    console.log('Wrote cleansed file to ' + FILENAME_MONAG_C );
+  });
 });
 pars.wsRANGE.ws.on('finish', () => {
   console.log('Wrote data to file ' + FILENAME_RANGE );
-  Helpers.cleanseWSInFile(FILENAME_RANGE, FILENAME_RANGE_C);
+  Helpers.cleanseWSInFile(FILENAME_RANGE, FILENAME_RANGE_C, function() {
+    console.log('Wrote cleansed file to ' + FILENAME_RANGE_C );
+  });
 });
 
 pars.wsMONAG.ws.end();

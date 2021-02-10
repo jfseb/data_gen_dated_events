@@ -1,6 +1,8 @@
 var fs = require('fs');
 const { exit } = require('process');
 import * as _ from 'lodash';
+import * as lineByLine from 'n-readlines';
+import * as readline from 'readline';
 
 //var seedrandom = require('seedrandom');
 import * as seedrandom from 'seedrandom';
@@ -46,9 +48,36 @@ export class WSWrap  {
   }
 };
 
+export class WSWrap2  {
+  ws: any;
+  _log: any;
+  _onFinish : any;
+  constructor(fn : string)
+  {
+    this.ws = this;
+    this._log = fs.openSync(fn,'w');
+    this._onFinish = undefined;
+  }
+  on( s : string, fn : any) {
+    this._onFinish = fn;
+  }
+  end() {
+    fs.closeSync(this._log);
+    this._log = undefined;
+    if( this._onFinish) {
+      this._onFinish();
+    }
+  }
+  write(a : any) {
+    fs.writeSync(this._log, '' + a);
+    return this;
+  }
+};
+
+
 export function getWS(filename: string) : WSWrap {
 
-  return new WSWrap(filename);
+  return new WSWrap2(filename);
 }
 
 
@@ -366,7 +395,7 @@ export function writeRecord(ws, dateIdx : LocalDate, pers : Person, pars : GenPa
   }
   pers.hiredPrev = pers.hired;
   pers.ftePrev = pers.fte;
-  pers.prevDateEnd = dateIdx;
+  pers.prevDateEnd = copyDate(dateIdx);
 
   ws.write(comment + "\n");
 }
@@ -506,11 +535,11 @@ function writeSTOPRecordAfter(ws, pers : Person, d : LocalDate, pars: GenParams,
 
 // there is a change @date , new values are to the right;
 // this i called on a change in values.
-function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers, nextHire, nextLoc, nextFTE, nextESTAT, pars : GenParams, comment:string) {
+function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers :Person, nextHire, nextLoc, nextFTE, nextESTAT, pars : GenParams, comment:string) {
   var isChange = isAChange(pers, nextHire, nextLoc, nextFTE, nextESTAT);
   if ( !isChange && !isEOM(dateIdx)) {
     pers.location = nextLoc;
-    pers.nextFTE = nextFTE;  /// TODO FIX!
+    //pers.nextFTE = nextFTE;  /// TODO FIX!
     pers.ESTAT = nextESTAT;
     return;
   }
@@ -529,10 +558,13 @@ function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers, nextHire, nextLoc, 
     }
     pers.hired = 0;
     pers.hiredPrev = 0;
-    pers.lastTerm = dateIdx;
+    //pers.lastTerm = dateIdx;
   } else if ( isHIRE(pers,nextHire)) {
     pers.lastHired = dateIdx;
     pers.prevDateEnd = copyDate(dateIdx).minusDays(1);
+    // added
+    pers.ftePrev = pers.fte;
+    pers.hiredPrev = 1;
     // do nothing, will be captured next
   } else {
     // close previous record
@@ -660,14 +692,25 @@ export function genUSERHierarchy(nrpers : number ) {
 }
 
 
-export function cleanseWSInFile(filename1: string, filename2 : string ) {
-  var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
-  var lnc = ln.replace(/;\s+/g,";");
-  fs.writeFileSync(filename2, lnc)
+//export function cleanseWSInFile(filename1: string, filename2 : string ) {
+//  var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
+//  var lnc = ln.replace(/;\s+/g,";");
+//  fs.writeFileSync(filename2, lnc)
+//}
+
+export function cleanseWSInFile(filename1: string, filename2 : string, done : any ) : any {
+  //var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
+  var wsOut = getWS(filename2);
+  const liner = new lineByLine(filename1);
+  var line = "";
+  while( line = liner.next() ){
+    if ( line ) {
+      wsOut.write( ('' + line).replace(/;\s+/g,";") ).write('\n');
+    }
+  }
+  wsOut.ws.on('finish', () => { done(); });
+  wsOut.ws.end();
 }
-
-
-
 
 export function genUser(i : number) : string {
   return 'P' + padZeros(i,5);

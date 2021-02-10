@@ -32,5 +32,8 @@ gulp test
 
 
 ```
-npm run
+node js\index.js --NRPERS 20  --nonpm run
 ```
+
+
+

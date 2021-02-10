@@ -389,3 +389,19 @@ it('testGenHierarchy', done => {
 }
 );
 
+it('testWSWrap', done => {
+  var u = Helpers.getWS('testData/xx.tmp');
+  u.write('0; 0; 000; 123; "  ";0;');
+  u.ws.on('finish', () => {
+    Helpers.cleanseWSInFile('testData/xx.tmp', 'testData/cleansed.S.csv.tmp', function() {
+      {
+        var expDim = readFromFile('testData/cleansed.S.csv') + '';
+        var actDim = readFromFile('testData/cleansed.S.csv.tmp') + '';
+        expect(actDim.replace(/\r\n/g,"\n")).toEqual(expDim);
+      }
+      done();
+    });
+  });
+  u.ws.end();
+}
+);

@@ -37,6 +37,7 @@
     "argparse": "^2.0.1",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
+    "n-readlines": "^1.0.1",
     "seedrandom": "^3.0.5"
   },
   "devDependencies": {

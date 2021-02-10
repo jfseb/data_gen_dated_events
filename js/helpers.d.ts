@@ -7,6 +7,15 @@ export declare class WSWrap {
     constructor(fn: string);
     write(a: any): this;
 }
+export declare class WSWrap2 {
+    ws: any;
+    _log: any;
+    _onFinish: any;
+    constructor(fn: string);
+    on(s: string, fn: any): void;
+    end(): void;
+    write(a: any): this;
+}
 export declare function getWS(filename: string): WSWrap;
 export declare class OptsMONAG {
     noZero: boolean;
@@ -90,6 +99,6 @@ export declare function isHireChange(pars: GenParams): boolean;
 export declare function genPerson(p: any, pars: GenParams): void;
 export declare function getMaxPrimes(nr: number): number;
 export declare function genUSERHierarchy(nrpers: number): void;
-export declare function cleanseWSInFile(filename1: string, filename2: string): void;
+export declare function cleanseWSInFile(filename1: string, filename2: string, done: any): any;
 export declare function genUser(i: number): string;
 export declare function genUSERHierarchyW(ws: any, nrpers: number): void;
