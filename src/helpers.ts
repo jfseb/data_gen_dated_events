@@ -36,18 +36,6 @@ export function makeMap(obj) {
   return res;
 }
 
-export class WSWrap  {
-  ws: any;
-  constructor(fn : string)
-  {
-    this.ws = fs.createWriteStream(fn);
-  }
-  write(a) {
-    this.ws.write('' + a);
-    return this;
-  }
-};
-
 export class WSWrap2  {
   ws: any;
   _log: any;
@@ -75,7 +63,7 @@ export class WSWrap2  {
 };
 
 
-export function getWS(filename: string) : WSWrap {
+export function getWS(filename: string) : WSWrap2 {
 
   return new WSWrap2(filename);
 }
@@ -180,19 +168,8 @@ function isEvent(pars:GenParams) {
   return pars.random() < pars.L_EVENT;
 }
 
-export function dateIndexToDate(dateIdx : number) : LocalDate {
-  return LocalDate.ofEpochDay(dateIdx - EXCELOFFSET);
-}
-
-function isEOM(dateIdx : any) {
-  var d = undefined as LocalDate;
-  if ( dateIdx instanceof LocalDate) {
-    d = dateIdx;
-  }
-  else {
-     d = dateIndexToDate(dateIdx);
-  }
-  var d = copyDate(d).plusDays(1);
+function isEOM(dateIdx : LocalDate) {
+  var d = copyDate(dateIdx).plusDays(1);
   if(d.dayOfMonth() == 1)
     return true;
   return false;
@@ -234,13 +211,8 @@ export function padSpaceQ(a : any, len : number) {
 }
 
 
-export function asDate(dateIdx : any): string {
-  var d = undefined as LocalDate;
-  if ( dateIdx instanceof LocalDate) {
-    d = dateIdx;
-  } else {
-    d = dateIndexToDate(dateIdx);
-  }
+export function asDate(dateIdx : LocalDate): string {
+  var d =dateIdx;
   return '' + d;
   //return d.year() + "-" + pad(d.monthValue(),2) + "-" + pad(d.dayOfMonth(),2);
 }
@@ -249,13 +221,8 @@ export function EOMONTH(d : LocalDate) : LocalDate {
   return copyDate(d).plusMonths(1).withDayOfMonth(1).minusDays(1);
 }
 
-export function daysInMonth(d : any) {
-  var dt =undefined as LocalDate;
-  if(d instanceof LocalDate ) {
-    dt = d;
-  } else {
-    dt = dateIndexToDate(d as number);
-  }
+export function daysInMonth(dateIdx : LocalDate) {
+  var dt =dateIdx;
   var deom = EOMONTH(dt);
   return dateToDayIndex(deom) - dateToDayIndex(copyDate(deom).withDayOfMonth(1)) + 1;
 }
