@@ -1,5 +1,4 @@
-# data_gen_dated_events
-# t [![Build Status](https://www.travis-ci.com/jfseb/data_gen_dated_events.svg?branch=main)](https://www.travis-ci.com/jfseb/data_gen_dated_events.svg?branch=main)[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
+# data_gen_dated_events [![Build Status](https://www.travis-ci.com/jfseb/data_gen_dated_events.svg?branch=main)](https://www.travis-ci.com/jfseb/data_gen_dated_events.svg?branch=main)[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
 
 
 
@@ -18,8 +17,7 @@ This currently generates a sparse "hired values only" data with just two dimensi
 248;202008;202008;202008;44068;44074;1.0;0.0;0.0;31;2020-08-25;2020-08-31;"P1"   ;"Frankfurt"           ;0.0;1.0;0.0; 0;0.0;0.5;0.0;   0;0;0;0;0;0;0;stEOM
 ```
 
-Work in progress, currently test result is used.
-
+run it without arguments
 
 ```
 git clone ...
