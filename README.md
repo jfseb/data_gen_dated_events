@@ -16,8 +16,15 @@ This currently generates a sparse "hired values only" data with just two dimensi
 248;202008;202008;202008;44044;44067;0.0;0.0;0.0;31;2020-08-01;2020-08-24;"P1"   ;"NewYork"             ;1.0;0.0;0.0;24;0.5;0.0;0.0;  12;5;0;0;30;0;0;termclose-12020-08-25 HC
 248;202008;202008;202008;44068;44074;1.0;0.0;0.0;31;2020-08-25;2020-08-31;"P1"   ;"Frankfurt"           ;0.0;1.0;0.0; 0;0.0;0.5;0.0;   0;0;0;0;0;0;0;stEOM
 ```
+MONAG are monthly argregates, without zero
 
-run it without arguments
+
+run it without arguments to get available options
+(nrpersons, period length)
+
+
+#
+prerequisite:  nodejs
 
 ```
 git clone ...
@@ -27,10 +34,15 @@ gulp build
 gulp test
 ```
 
-
 ```
-node js\index.js --NRPERS 20  --nonpm run
+node js\index.js --nrpersons 20
 ```
 
+alternatively:
+```
+npm run start -- --nrpersons 20 --stopRecords
+```
 
+or run the genSER_S.cmd to generate a set of data (3, 100, 200, 500, 1000, 2000, 10000)
 
+Note that larger sets are a superset of the smaller sets -> Stable PRNG
