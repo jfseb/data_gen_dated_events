@@ -3,6 +3,7 @@ const { isFunctionDeclaration } = require("typescript");
 var root = '../js';
 
 var Helpers = require(root + '/helpers.js');
+var ParseArgs = require(root + '/parseArgs.js');
 var LocalDate = require('@js-joda/core').LocalDate;
 
 var _ = require('lodash');
@@ -403,5 +404,56 @@ it('testWSWrap', done => {
     });
   });
   u.ws.end();
+}
+);
+
+it('testParseArgs', done => {
+  expect(ParseArgs.parseArguments('-n 3 -s -u')).toEqual( { nrpersons: 3, period : 150, stopRecords : true, userHierarchy : true, zero : false } );
+  expect(ParseArgs.parseArguments('-n 34 --zero --period 413')).toEqual( { nrpersons: 34, period : 413, stopRecords : false, userHierarchy : false, zero : true } );
+  done();
+}
+);
+
+it('testGetOutputParams', done => {
+  var o = ParseArgs.getOutputParams( { nrpersons: 3, period: 222, zero: true, stopRecords : true} );
+  expect(o.FILENAME_MONAG).toEqual("MONAG_0222_000003.Z.S.csv");
+  done();
+}
+);
+
+it('testGetParams1', done => {
+  var o = ParseArgs.GetParams1( { nrpersons: 4, period : 222, nozero: true, stopRecords : true} );
+  expect(o.NRPERS).toEqual(4);
+  expect(o.optsMONAG.stopRecords).toEqual(true);
+  expect(o.optsMONAG.noZero).toEqual(true);
+  done();
+}
+);
+
+
+it('testRunFile', done => {
+
+  /*
+  export class OutputParams {
+    NRPERS : string;
+    AVG_NEXT : number;
+    FILENAME_MONAG : string;
+    FILENAME_MONAG_C : string;
+    FILENAME_RANGE : string;
+    FILENAME_RANGE_C : string;
+    NOZERO : boolean;
+    STOPRECORDs: boolean;
+  } */
+  var p  = ParseArgs.GetParams1( { nrpers: 4, periods : 222, nozero: true, stopRecords : true} );
+  var o = {
+    NRPERS : p.NRPERS,
+    AVG_NEXT : 222,
+    FILENAME_MONAG : 'testData/M1.csv.tmp',
+    FILENAME_MONAG_C : 'testData/M1.csv.tmp',
+    FILENAME_RANGE : 'testData/R1.csv.tmp',
+    FILENAME_RANGE_C : 'testData/R1.csv.C.tmp'
+  };
+  ParseArgs.GeneratePersons( p, o );
+  done();
 }
 );

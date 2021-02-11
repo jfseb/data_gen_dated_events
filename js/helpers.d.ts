@@ -17,6 +17,7 @@ export declare class OptsMONAG {
     stopRecords: boolean;
 }
 export declare class GenParams {
+    NRPERS: number;
     AVG_NEXT: number;
     LOCCHANGE: number;
     FTECHANGE: number;

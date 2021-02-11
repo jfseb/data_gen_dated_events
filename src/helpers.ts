@@ -84,6 +84,7 @@ export class OptsMONAG {
 }
 
 export class GenParams {
+  NRPERS : number;
   AVG_NEXT : number;
   LOCCHANGE : number;
   FTECHANGE: number;

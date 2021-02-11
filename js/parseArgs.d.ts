@@ -1,0 +1,24 @@
+import * as Helpers from './helpers';
+export declare class ParsedArgs {
+    nrpersons: number;
+    zero: boolean;
+    stopRecords: boolean;
+    output: string;
+    period: number;
+    userHierarchy: boolean;
+}
+export declare function parseArguments(explicitArgs: string): ParsedArgs;
+export declare class OutputParams {
+    NRPERS: string;
+    AVG_NEXT: number;
+    FILENAME_MONAG: string;
+    FILENAME_MONAG_C: string;
+    FILENAME_RANGE: string;
+    FILENAME_RANGE_C: string;
+    NOZERO: boolean;
+    STOPRECORDs: boolean;
+}
+export declare function getOutputParams(args: ParsedArgs): OutputParams;
+export declare function dumpUserHierarchyIfRequested(args: ParsedArgs): void;
+export declare function GetParams1(args: ParsedArgs): Helpers.GenParams;
+export declare function GeneratePersons(pars: Helpers.GenParams, o: OutputParams): void;
