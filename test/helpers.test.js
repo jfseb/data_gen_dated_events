@@ -427,8 +427,15 @@ it('testGetParams1', done => {
   expect(o.optsMONAG.stopRecords).toEqual(true);
   expect(o.optsMONAG.noZero).toEqual(true);
   done();
-}
-);
+});
+
+
+
+it('testGetParams1', done => {
+  ParseArgs.dumpUserHierarchyIfRequested( { nrpersons: 4, period : 222, nozero: true, stopRecords : true} );
+  ParseArgs.dumpUserHierarchyIfRequested( { nrpersons: 100, period : 222, nozero: true, stopRecords : true, userHierarchy : true } );
+  done();
+});
 
 
 it('testRunFile', done => {
@@ -444,7 +451,7 @@ it('testRunFile', done => {
     NOZERO : boolean;
     STOPRECORDs: boolean;
   } */
-  var p  = ParseArgs.GetParams1( { nrpers: 4, periods : 222, nozero: true, stopRecords : true} );
+  var p  = ParseArgs.GetParams1( { nrpersons: 4, period : 222, nozero: true, stopRecords : true} );
   var o = {
     NRPERS : p.NRPERS,
     AVG_NEXT : 222,

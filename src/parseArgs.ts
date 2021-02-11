@@ -33,7 +33,7 @@ export function parseArguments(explicitArgs : string) {
 
 	var args = parser.parse_args( explicitArgs? explicitArgs.split(' ')  : undefined);
 
-	console.log(JSON.stringify(args));
+	//console.log(JSON.stringify(args));
 	return JSON.parse(JSON.stringify(args)) as ParsedArgs;
 }
 
