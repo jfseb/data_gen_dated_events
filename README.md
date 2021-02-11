@@ -1,7 +1,6 @@
 # data_gen_dated_events
-# t [![Build Status](https://travis-ci.org/jfseb/data_gen_dated_events.svg?branch=main)](https://travis-ci.org/jfseb/data_gen_dated_events)[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
+# t [![Build Status](https://www.travis-ci.com/jfseb/data_gen_dated_events.svg?branch=main)](https://www.travis-ci.com/jfseb/data_gen_dated_events.svg?branch=main)[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
 
-[![Coverage Status](https://coveralls.io/repos/github/jfseb/data_gen_dated_events/badge.svg?branch=main)](https://coveralls.io/github/jfseb/data_gen_dated_events?branch=main)
 
 
 Sample Data Generator for date events, e.g. HR Data
