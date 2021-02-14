@@ -108,6 +108,7 @@ export class Person {
   // immutable
   user: string;
   gender : string;
+  eventReason : string;
   // changing
   dob: LocalDate;
   location : string;
@@ -122,6 +123,7 @@ export class Person {
   ESTATSOM : string;
   // changing
   lastHired: LocalDate;
+  lastEventDate : LocalDate;
   prevDateEnd : LocalDate;
   prevRangeEnd: LocalDate; // end of last range
 }
@@ -142,6 +144,48 @@ function getGender(pars: GenParams) {
   return ( pars.random.otherRandom(2) < 0.5 ) ? "F": "M";
 }
 
+function getHireEventReason(pars: GenParams): string {
+  return "HI" + (Math.floor(pars.random.otherRandom(4) * 100) % 5);
+}
+
+function getTermEventReason(pars: GenParams) : string {
+  return "TR" + (Math.floor(pars.random.otherRandom(4) * 100) % 10);
+}
+
+function getLocationEventReason(pars: GenParams) : string {
+  return "L" + padZeros((Math.floor(pars.random.otherRandom(4) * 100) % 50),2);
+}
+function getPlainEventReason(pars: GenParams) : string {
+  return "P" + padZeros((Math.floor(pars.random.otherRandom(4) * 100) % 10),2);
+}
+
+export function isHireER(er : string) {
+  return (er.charAt(0) == "H") ? "1" : "0";
+}
+
+export function isTermER(er : string) {
+  return (er.charAt(0) == "T") ? "1" : "0";
+}
+
+export function isOtherER(er : string) {
+  return ((!isHireER(er) && !isTermER(er))) ? "1" : "0";
+}
+
+
+function getHireTermEventReason(pars : GenParams, priorHired: number ) {
+  if ( priorHired ) {
+    return getTermEventReason(pars);
+  } else {
+    return getHireEventReason(pars);
+  }
+}
+
+function getOtherEventReason(pars: GenParams, pers: Person, nl: string) {
+  if ( pers.location != nl ) {
+    return getLocationEventReason(pars);
+  }
+  return getPlainEventReason(pars);
+}
 
 function nextLocation(pars: GenParams, pers : Person) {
   if( pars.random.random() < pars.LOCCHANGE) {
@@ -354,7 +398,7 @@ export function writeRecord(ws, dateIdx : LocalDate, pers : Person, pars : GenPa
   ws.write(padSpaceQ(pers.user,5)).write(';');
   ws.write(padSpaceQ(pers.location,20)).write(';');
   ws.write(padSpaceQ(pers.ESTAT,1)).write(';'); // we always write this, needed for STOP records
-  writeTripel(ws, pers.hiredSOM ? "1.0": "0.0" ,pers.hired ? "1.0": "0.0",isEOM(dateIdx));
+  writeTripel(ws, pers.hiredSOM ? "1.0": "0.0", pers.hired ? "1.0": "0.0",isEOM(dateIdx));
   var daysInPeriod = startIdx.until(dateIdx).days() + 1;
   ws.write(padSpace(pers.hiredPrev * daysInPeriod,2)).write(';'); //DAYSWORKED
   writeTripel(ws, toDec1(pers.fteSOM),toDec1(pers.hired * pers.fte),isEOM(dateIdx));
@@ -368,9 +412,20 @@ export function writeRecord(ws, dateIdx : LocalDate, pers : Person, pars : GenPa
   }
   pers.hiredPrev = pers.hired;
   pers.ftePrev = pers.fte;
-  pers.prevDateEnd = copyDate(dateIdx);
 
-  ws.write("0;0;0;0;;  \"" + pers.gender + "\";" + comment + "\n");
+  // we can use this as MOVE_OUT or TERM
+  var dateIdxP1 = copyDate(dateIdx).plusDays(1);
+  if( (""+dateIdxP1) == (""+pers.lastEventDate) ) {
+    var hasER = ("1" == isTermER(pers.eventReason)) || ("1" == isOtherER(pers.eventReason));
+    ws.write("0;" +
+             isTermER(pers.eventReason) + ";0;" +
+             isOtherER(pers.eventReason) + ";" +
+        (hasER ? (pers.eventReason + ";") : ";  ") + "\"" + pers.gender + "\";" + comment + "\n");
+  }
+  else {
+    ws.write("0;0;0;0;;  \"" + pers.gender + "\";" + comment + "\n");
+  }
+  pers.prevDateEnd = copyDate(dateIdx);
 }
 
 /**
@@ -594,6 +649,7 @@ export function genPerson(p, pars: GenParams) {
     fteSOM : 0,
     ESTAT : "A",
     ESTATSOM : "A",
+    eventReason : undefined,
     gender : getGender(pars)
   } as Person;
   var nextDate = getNext(pars) + pars.firstDate.toEpochDay();
@@ -604,6 +660,8 @@ export function genPerson(p, pars: GenParams) {
        // writeChangeLineMONAG(pars.wsMONAG, d,pers, pers.hired ? 0 : 1, nextLocation(pars,pers), nextFTE(pars,pers)  , "HC");
         //+
         // ORDER IS CRUCIAL!
+        pers.eventReason = getHireTermEventReason(pars, pers.hired);
+        pers.lastEventDate = d;
         var nl = nextLocation(pars,pers);
         var nf = nextFTE(pars,pers);
         var nESTAT = getNextESTAT(pars,pers,"ESTAT");
@@ -620,6 +678,8 @@ export function genPerson(p, pars: GenParams) {
           // force
           nf = nextFTE(pars, pers);
         }
+        pers.lastEventDate = d;
+        pers.eventReason = getOtherEventReason(pars, pers, nl);
         writeChangeLineRANGE(pars.wsRANGE, d, pers, pers.hired, nl, nf, nESTAT, pars, "LC");
         writeChangeLineMONAG(pars.wsMONAG, d, pers, pers.hired, nl, nf, nESTAT, pars, "LC" );
         nextDate += getNext(pars);

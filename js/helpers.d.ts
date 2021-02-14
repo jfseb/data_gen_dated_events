@@ -39,6 +39,7 @@ export declare class GenParams {
 export declare class Person {
     user: string;
     gender: string;
+    eventReason: string;
     dob: LocalDate;
     location: string;
     hired: number;
@@ -51,9 +52,13 @@ export declare class Person {
     ESTATPrev: string;
     ESTATSOM: string;
     lastHired: LocalDate;
+    lastEventDate: LocalDate;
     prevDateEnd: LocalDate;
     prevRangeEnd: LocalDate;
 }
+export declare function isHireER(er: string): "1" | "0";
+export declare function isTermER(er: string): "1" | "0";
+export declare function isOtherER(er: string): "1" | "0";
 export declare function copyDate(d: LocalDate): LocalDate;
 export declare function isEOQ(d: LocalDate): boolean;
 export declare function isEOY(d: LocalDate): boolean;

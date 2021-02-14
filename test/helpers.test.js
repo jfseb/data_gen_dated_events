@@ -266,21 +266,6 @@ it('testGenPerson1', done => {
   pars.wsMONAG = wsMONAG;
   pars.wsRANGE = wsRANGE;
   initParsRandom(pars);
-  /*
-  {
-    AVG_NEXT : 150,
-    LOCCHANGE : 0.5,
-    FTECHANGE : 0.5,
-    L_EVENT : 0.7,
-    L_HIRE : 0.5,
-    locations : Helpers.makeMap(LocationsObj),
-    firstDate : d1,
-    lastDate  : d2,
-    random : seedrandom('abc'),
-    wsMONAG : wsMONAG,
-    wsRANGE : wsRANGE
-  };
-  */
   Helpers.writeHeader(wsMONAG);
   Helpers.genPerson('P1', pars);
   writeToFile('testData/gp1.monag.csv.tmp',wsMONAG);
@@ -302,19 +287,6 @@ it('testGenPersonB', done => {
   var d2Idx = Helpers.dateToDayIndex(d2);
   var pars = _.clone(DEFPARS);
   initParsRandom(pars);
-  /* {
-    AVG_NEXT : 150,
-    LOCCHANGE : 0.5,
-    FTECHANGE : 0.5,
-    L_EVENT : 0.7,
-    L_HIRE : 0.5,
-    locations : Helpers.makeMap(LocationsObj),
-    firstDate : d1,
-    lastDate  : d2,
-    random : seedrandom('abc'),
-    wsMONAG : wsMONAG,
-    wsRANGE : wsRANGE
-  };*/
   pars.wsMONAG = wsMONAG;
   pars.wsRANGE = wsRANGE;
   Helpers.writeHeader( wsMONAG );
@@ -361,8 +333,7 @@ it('testGenPersonStopNZ', done => {
     expect(wsRANGE.toString().replace(/\r\n/g,"\n")).toEqual(expRANGE.replace(/\r\n/g,"\n"));
   }
   done();
-}
-);
+});
 
 it('testGetMaxPrim', done => {
   expect(Helpers.getMaxPrimes(1)).toEqual(1);
