@@ -25,10 +25,13 @@ run it without arguments to get available options
 
 #
 prerequisite:  nodejs
+   (gulp, tsc may need global install, other  )
 
 ```
 git clone ...
 npm install
+
+npm run build
 
 gulp build
 gulp test

@@ -20,5 +20,13 @@ export declare class OutputParams {
 }
 export declare function getOutputParams(args: ParsedArgs): OutputParams;
 export declare function dumpUserHierarchyIfRequested(args: ParsedArgs): void;
+export declare class SeedRandomWrap {
+    sr: any;
+    _last: number;
+    constructor(s: string);
+    random(): number;
+    otherRandom(i: number): number;
+}
+export declare function makeSeedRandom(s: string): SeedRandomWrap;
 export declare function GetParams1(args: ParsedArgs): Helpers.GenParams;
 export declare function GeneratePersons(pars: Helpers.GenParams, o: OutputParams): void;

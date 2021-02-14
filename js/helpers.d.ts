@@ -94,6 +94,12 @@ export declare function isHireChange(pars: GenParams): boolean;
 export declare function genPerson(p: any, pars: GenParams): void;
 export declare function getMaxPrimes(nr: number): number;
 export declare function genUSERHierarchy(nrpers: number): void;
-export declare function cleanseWSInFile(filename1: string, filename2: string, done: any): any;
+/**
+ * Also strips comments lines with #
+ * @param filename1
+ * @param filename2
+ * @param done
+ */
+export declare function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, filename2: string, done: any): any;
 export declare function genUser(i: number): string;
 export declare function genUSERHierarchyW(ws: any, nrpers: number): void;

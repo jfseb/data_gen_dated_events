@@ -230,7 +230,7 @@ export function daysInMonth(dateIdx : LocalDate) {
 
 export function writeHeader(ws) {
   ws.write("YEAR;QUART;CALMONTHIC;CALMONTHI;CALMONTH;CALMONTHS;START_DATE_IDX;END_DATE_IDX;ISEOM;ISEOQ;ISEOY;DAYSINMONTH;START_DATE;END_DATE;")
-  ws.write("USER;LOCATION;ESTAT;HC;HC_SOM;HC_EOM;DAYSWORKED;FTE;FTE_SOM;FTE_EOM;FTEWORKED;TENURE;TENURE_SOM;TENURE_EOM;AGE;AGE_SOM;AGE_EOM;HC_EOMS;X\n")
+  ws.write("USER;LOCATION;ESTAT;HC;HC_SOM;HC_EOM;DAYSWORKED;FTE;FTE_SOM;FTE_EOM;FTEWORKED;TENURE;TENURE_SOM;TENURE_EOM;AGE;AGE_SOM;AGE_EOM;HC_EOMS;HIRE;TERM;MOVE_OUT;MOVE_IN;EVRS;GNDR;X\n")
 }
 
 export function makeQuarter(d : LocalDate) {
@@ -659,21 +659,31 @@ export function genUSERHierarchy(nrpers : number ) {
   ws.ws.end();
 }
 
+function isDigit(char : string) {
+  return "0123456789".indexOf(char) > 0;
+}
 
-//export function cleanseWSInFile(filename1: string, filename2 : string ) {
-//  var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
-//  var lnc = ln.replace(/;\s+/g,";");
-//  fs.writeFileSync(filename2, lnc)
-//}
+function isDigitStartLine(line : string) {
+  var lines = ''+line;
+  return lines.length > 0 &&  !isDigit(lines.charAt(0));
+}
 
-export function cleanseWSInFile(filename1: string, filename2 : string, done : any ) : any {
+/**
+ * Also strips comments lines with #
+ * @param filename1
+ * @param filename2
+ * @param done
+ */
+export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, filename2 : string, done : any ) : any {
   //var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
   var wsOut = getWS(filename2);
   const liner = new lineByLine(filename1);
   var line = "";
+  var nr = 0;
   while( line = liner.next() ){
-    if ( line ) {
+    if ( line && !(''+line).startsWith('#') && (nr < 1 || isDigitStartLine(line))) {
       wsOut.write( ('' + line).replace(/;\s+/g,";") ).write('\n');
+      ++nr;
     }
   }
   wsOut.ws.on('finish', () => { done(); });

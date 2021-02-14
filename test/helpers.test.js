@@ -394,7 +394,7 @@ it('testWSWrap', done => {
   var u = Helpers.getWS('testData/xx.tmp');
   u.write('0; 0; 000; 123; "  ";0;');
   u.ws.on('finish', () => {
-    Helpers.cleanseWSInFile('testData/xx.tmp', 'testData/cleansed.S.csv.tmp', function() {
+    Helpers.cleanseWSCommentsRepeatedHeaderInFile('testData/xx.tmp', 'testData/cleansed.S.csv.tmp', function() {
       {
         var expDim = readFromFile('testData/cleansed.S.csv') + '';
         var actDim = readFromFile('testData/cleansed.S.csv.tmp') + '';
@@ -407,9 +407,45 @@ it('testWSWrap', done => {
 }
 );
 
+
+it('testCleanseESTBUN', done => {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_EASTBU.S.csv', 'input/MONAG_SAMPLE_EASTBU.S.C.csv', function() {
+    done();
+  });
+}
+);
+
+it('testCleanseASANTA', done => {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_ASANTA.S.csv', 'input/MONAG_SAMPLE_ASTANTA.S.C.csv', function() {
+      done();
+  });
+}
+);
+
+it('testCleanseA1', done => {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_A1.S.csv', 'input/MONAG_SAMPLE_A1.S.C.csv', function() {
+    done();
+  });
+}
+);
+
+it('testCleanseJBAKER', done => {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_JBAKER.S.csv', 'input/MONAG_SAMPLE_JBAKER.S.C.csv', function() {
+      done();
+  });
+}
+);
+
+it('testCleanseTWALKER', done => {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_TWALKE.S.csv', 'input/MONAG_SAMPLE_TWALKE.C.csv', function() {
+      done();
+  });
+}
+);
+
 it('testParseArgs', done => {
-  expect(ParseArgs.parseArguments('-n 3 -s -u')).toEqual( { nrpersons: 3, period : 150, stopRecords : true, userHierarchy : true, zero : false } );
-  expect(ParseArgs.parseArguments('-n 34 --zero --period 413')).toEqual( { nrpersons: 34, period : 413, stopRecords : false, userHierarchy : false, zero : true } );
+  expect(ParseArgs.parseArguments('-n 3 -s -u')).toEqual( { nrpersons: 3, period : 150, stopRecords : true, userHierarchy : true, zero : false, addSamples: false } );
+  expect(ParseArgs.parseArguments('-n 34 --zero --period 413')).toEqual( { nrpersons: 34, period : 413, stopRecords : false, userHierarchy : false, zero : true, addSamples: false } );
   done();
 }
 );
@@ -429,17 +465,13 @@ it('testGetParams1', done => {
   done();
 });
 
-
-
 it('testGetParams1', done => {
   ParseArgs.dumpUserHierarchyIfRequested( { nrpersons: 4, period : 222, nozero: true, stopRecords : true} );
   ParseArgs.dumpUserHierarchyIfRequested( { nrpersons: 100, period : 222, nozero: true, stopRecords : true, userHierarchy : true } );
   done();
 });
 
-
 it('testRunFile', done => {
-
   /*
   export class OutputParams {
     NRPERS : string;

@@ -27,6 +27,7 @@ export function parseArguments(explicitArgs : string) {
 	parser.add_argument('-n', '--nrpersons', { action : 'store', type: "int", help: 'Number of persons' , default: 2 });
 	parser.add_argument('-z', '--zero', { action: 'store_true',  help: 'write zero lines ( one record each month) .Z. ' });
 	parser.add_argument('-s', '--stopRecords', { action: 'store_true', help: 'write stop records, default extension .S. ' });
+	parser.add_argument('-a', '--addSamples', { action: 'store_true', help: 'adds fixed samples from input folder to files' });
 	parser.add_argument('-o', '--output', { action : 'store', help: 'output prefix, default MONAG_<nrpers>.Z.csv , RANGE_<nrpers>.xx' });
 	parser.add_argument('-p', '--period', { action: 'store', type: "int", default : 150,  help: 'Event period write zero lines ( one reacord each month) .Z. ' });
 	parser.add_argument('-u', '--userHierarchy', { action: 'store_true', help: 'generate hierarchy for nrpersons (DIM_USER_<xxxx>.csv) ' });
@@ -78,6 +79,32 @@ export function dumpUserHierarchyIfRequested(args: ParsedArgs ) {
 	if ( args.userHierarchy ) {
 		Helpers.genUSERHierarchy(args.nrpersons);
 	}
+}
+
+export class SeedRandomWrap {
+	sr : any;
+	_last : number;
+	constructor(s:string) {
+		this.sr = seedrandom(s)
+	}
+	random() : number {
+		this._last = this.sr.random();
+		return this._last;
+	}
+	otherRandom(i : number) : number {
+		var base = 100;
+		for(var k = 0; k < i; ++i) {
+			base *= 10;
+		}
+		var b = this._last * base;
+		var u = b - Math.floor(this._last * base);
+		return u;
+	}
+};
+
+
+export function makeSeedRandom(s : string) {
+	return new SeedRandomWrap(s);
 }
 
 export function GetParams1(args: ParsedArgs) : Helpers.GenParams {
@@ -138,13 +165,13 @@ export function GeneratePersons( pars: Helpers.GenParams, o : OutputParams ) {
 
 	pars.wsMONAG.ws.on('finish', () => {
 		console.log('Wrote data to file ' + o.FILENAME_MONAG );
-		Helpers.cleanseWSInFile(o.FILENAME_MONAG, o.FILENAME_MONAG_C, function() {
+		Helpers.cleanseWSCommentsRepeatedHeaderInFile(o.FILENAME_MONAG, o.FILENAME_MONAG_C, function() {
 			console.log('Wrote cleansed file to ' + o.FILENAME_MONAG_C );
 		});
 	});
 	pars.wsRANGE.ws.on('finish', () => {
 		console.log('Wrote data to file ' + o.FILENAME_RANGE );
-		Helpers.cleanseWSInFile(o.FILENAME_RANGE, o.FILENAME_RANGE_C, function() {
+		Helpers.cleanseWSCommentsRepeatedHeaderInFile(o.FILENAME_RANGE, o.FILENAME_RANGE_C, function() {
 			console.log('Wrote cleansed file to ' + o.FILENAME_RANGE_C );
 		});
 	});
