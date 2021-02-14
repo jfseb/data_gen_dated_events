@@ -27,6 +27,6 @@ export declare class SeedRandomWrap {
     random(): number;
     otherRandom(i: number): number;
 }
-export declare function makeSeedRandom(s: string): SeedRandomWrap;
+export declare function getSeedRandom(s: string): SeedRandomWrap;
 export declare function GetParams1(args: ParsedArgs): Helpers.GenParams;
 export declare function GeneratePersons(pars: Helpers.GenParams, o: OutputParams): void;

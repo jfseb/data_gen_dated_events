@@ -85,15 +85,15 @@ export class SeedRandomWrap {
 	sr : any;
 	_last : number;
 	constructor(s:string) {
-		this.sr = seedrandom(s)
+		this.sr = new seedrandom(s)
 	}
 	random() : number {
-		this._last = this.sr.random();
+		this._last = this.sr();
 		return this._last;
 	}
 	otherRandom(i : number) : number {
 		var base = 100;
-		for(var k = 0; k < i; ++i) {
+		for(var k = 0; k < i; ++k) {
 			base *= 10;
 		}
 		var b = this._last * base;
@@ -103,7 +103,7 @@ export class SeedRandomWrap {
 };
 
 
-export function makeSeedRandom(s : string) {
+export function getSeedRandom(s : string) {
 	return new SeedRandomWrap(s);
 }
 
@@ -140,8 +140,8 @@ export function GetParams1(args: ParsedArgs) : Helpers.GenParams {
 	ESTATs : Helpers.makeMap(ESTAT_VALUES),
 	firstDate : d1,
 	lastDate  : d2,
-	random : seedrandom('abc'),
-	randomOD : { "ESTAT" : seedrandom('XZY') },
+	random : getSeedRandom('abc'),
+	randomOD : { "ESTAT" : getSeedRandom('XZY') },
 	REOP_ESTATS :  ["A","U","P"],
 	wsMONAG : undefined,
 	wsRANGE : undefined,

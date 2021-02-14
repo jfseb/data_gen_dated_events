@@ -107,6 +107,7 @@ export class GenParams {
 export class Person {
   // immutable
   user: string;
+  gender : string;
   // changing
   dob: LocalDate;
   location : string;
@@ -126,27 +127,31 @@ export class Person {
 }
 
 function getNext(pars:GenParams) {
-  return Math.floor(pars.random() * pars.AVG_NEXT) + 1;
+  return Math.floor(pars.random.random() * pars.AVG_NEXT) + 1;
 }
 
 function getLocation(pars: GenParams) {
-  return pars.LOCATIONs[Math.floor(pars.random() * pars.LOCATIONs.length)];
+  return pars.LOCATIONs[Math.floor(pars.random.random() * pars.LOCATIONs.length)];
 }
 
 function getESTAT(pars: GenParams, key : string) {
-  return pars.ESTATs[Math.floor(pars.randomOD[key]() * pars.ESTATs.length)];
+  return pars.ESTATs[Math.floor(pars.randomOD[key].random() * pars.ESTATs.length)];
+}
+
+function getGender(pars: GenParams) {
+  return ( pars.random.otherRandom(2) < 0.5 ) ? "F": "M";
 }
 
 
 function nextLocation(pars: GenParams, pers : Person) {
-  if( pars.random() < pars.LOCCHANGE) {
+  if( pars.random.random() < pars.LOCCHANGE) {
     return getLocation(pars);
   }
   return  pers.location;
 }
 
 function nextFTE(pars: GenParams, pers : Person) {
-  if( pars.random() < pars.FTECHANGE) {
+  if( pars.random.random() < pars.FTECHANGE) {
     if( pers.fte == 1) {
       return 0.5;
     }
@@ -158,7 +163,7 @@ function nextFTE(pars: GenParams, pers : Person) {
 
 function getNextESTAT(pars: GenParams, pers : Person, key : string) {
 //  pars.randomOD[key]();
-  if( pars.randomOD[key]() < pars.ESTATCHANGE) {
+  if( pars.randomOD[key].random() < pars.ESTATCHANGE) {
     return getESTAT(pars, key);
   }
   return  pers.ESTAT;
@@ -166,7 +171,7 @@ function getNextESTAT(pars: GenParams, pers : Person, key : string) {
 
 
 function isEvent(pars:GenParams) {
-  return pars.random() < pars.L_EVENT;
+  return pars.random.random() < pars.L_EVENT;
 }
 
 function isEOM(dateIdx : LocalDate) {
@@ -365,7 +370,7 @@ export function writeRecord(ws, dateIdx : LocalDate, pers : Person, pars : GenPa
   pers.ftePrev = pers.fte;
   pers.prevDateEnd = copyDate(dateIdx);
 
-  ws.write(comment + "\n");
+  ws.write("0;0;0;0;;  \"" + pers.gender + "\";" + comment + "\n");
 }
 
 /**
@@ -397,10 +402,10 @@ export function writeRecord0(ws, dateIdx : LocalDate, pers : Person,  comment: s
   //} else {
   //  ws.write('0').write(';');
   //}
-  ws.write(comment + "\n");
+  ws.write("0;0;0;0;;  \"" + pers.gender + "\";" + comment + "\n");
 }
 
-function writeStateLineRANGE(ws,dateIdx : LocalDate, pers : Person, nextHire, nextLoc, nextFTE, comment:string) {
+function writeStateLineRANGE(ws, dateIdx : LocalDate, pers : Person, nextHire, nextLoc, nextFTE, comment:string) {
   if(ws == undefined) {
     return;
   }
@@ -562,17 +567,16 @@ function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers :Person, nextHire, n
 /////////////////// percentages
 
 export function isHireChange(pars : GenParams) : boolean {
-  return pars.random() < pars.L_HIRE;
+  return pars.random.random() < pars.L_HIRE;
 }
 
 function getDOB(pars : GenParams) : LocalDate {
 
-  var year = 1950 + Math.floor(pars.random()*55);
-  var month = Math.floor(pars.random()*12);
-  var daybase = Math.floor(pars.random()*31);
+  var year = 1950 + Math.floor(pars.random.random()*55);
+  var month = Math.floor(pars.random.random()*12);
+  var daybase = Math.floor(pars.random.random()*31);
   return LocalDate.of(year,1+month, 1).plusDays(daybase - 1);
 }
-//LocalDate.of(1950+Math.floor(pars.random()*55),Math.floor(pars.random()*12),Math.floor(pars.random()*31)),
 
 export function genPerson(p, pars: GenParams) {
 	var pers = {
@@ -590,6 +594,7 @@ export function genPerson(p, pars: GenParams) {
     fteSOM : 0,
     ESTAT : "A",
     ESTATSOM : "A",
+    gender : getGender(pars)
   } as Person;
   var nextDate = getNext(pars) + pars.firstDate.toEpochDay();
   for(var i = pars.firstDate.toEpochDay(); i <= pars.lastDate.toEpochDay(); ++i) {
@@ -699,8 +704,6 @@ export function genUSERHierarchyW(ws : any, nrpers : number ) {
   // we build a parent child hierarchy  using prime number decomposition,
   // with persons made children of the "lagest prime factor"
   // to not end up with too many roots we only make every n-th prime factor a root.
-  //
-  //
   var res = {};
   var nrPrimes = 0;
   // 13 - 5 - 2

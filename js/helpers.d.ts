@@ -38,6 +38,7 @@ export declare class GenParams {
 }
 export declare class Person {
     user: string;
+    gender: string;
     dob: LocalDate;
     location: string;
     hired: number;

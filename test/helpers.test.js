@@ -187,9 +187,16 @@ it('testDaysInMonth', done => {
 
 
 it('testSeedRND', done => {
-  var rnd = seedrandom("first");
-  expect(rnd()).toEqual(0.5553384910006973);
-  expect(rnd()).toEqual(0.023301137453416255);
+  var rnd = ParseArgs.getSeedRandom("first");
+  expect(rnd.random()).toEqual(0.5553384910006973);
+  expect(rnd.random()).toEqual(0.023301137453416255);
+  expect(rnd.random()).toEqual(0.9234945529300768);
+  expect(rnd.otherRandom(1)).toEqual(0.494552930076793);
+  expect(rnd.random()).toEqual(0.18968538978539123);
+  expect(rnd.otherRandom(3)).toEqual(0.5389785391234909);
+  expect(rnd.otherRandom(8)).toEqual(0.853912353515625);
+  expect(rnd.otherRandom(2)).toEqual(0.8538978539122581);
+  expect(rnd.random()).toEqual(0.5111133580651583);
   done();
 }
 );
@@ -232,8 +239,8 @@ var DEFPARS = {
     ESTATs : Helpers.makeMap(ESTAT_VALUES),
     firstDate : undefined,
     lastDate  : undefined,
-    random : seedrandom('abc'),
-    randomOD : { "ESTAT" : new seedrandom('XZY') },
+    random : ParseArgs.getSeedRandom('abc'),
+    randomOD : { "ESTAT" : ParseArgs.getSeedRandom('XZY') },
     REOP_ESTATS :  ["A","U","P"],
     wsMONAG : undefined,
     wsRANGE : undefined
@@ -246,8 +253,8 @@ function initParsRandom( pars ) {
   var d2Idx = Helpers.dateToDayIndex(d2);
   pars.firstDate = d1;
   pars.lastDate = d2;
-  pars.random = seedrandom('abc');
-  pars.randomOD = { "ESTAT" : new seedrandom('XZY') }; // we use
+  pars.random = ParseArgs.getSeedRandom('abc');
+  pars.randomOD = { "ESTAT" : ParseArgs.getSeedRandom('XZY') }; // we use
 }
 
 it('testGenPerson1', done => {
@@ -344,7 +351,7 @@ it('testGenPersonStopNZ', done => {
   }
   Helpers.genPerson('P1', pars);
   writeToFile('testData/gp1.monagNZS.csv.tmp',wsMONAG);
-  writeToFile('testData/gp1.range2.csv.tmp',wsRANGE);
+  writeToFile('testData/gp1.range.csv.tmp',wsRANGE);
   {
     var expMONAG = readFromFile('testData/gp1.monagNZS.csv') + '';
     expect(wsMONAG.toString().replace(/\r\n/g,"\n")).toEqual(expMONAG.replace(/\r\n/g,"\n"));
