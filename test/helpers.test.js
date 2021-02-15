@@ -338,6 +338,16 @@ it('testGenPersonStopNZ', done => {
   done();
 });
 
+
+it('isDigitStartLine', done => {
+  expect(Helpers.isLineStartingWithDigit('0123')).toEqual(true);
+  expect(Helpers.isLineStartingWithDigit('1123')).toEqual(true);
+  expect(Helpers.isLineStartingWithDigit('AB')).toEqual(false);
+  expect(Helpers.isLineStartingWithDigit('#')).toEqual(false);
+  expect(Helpers.isLineStartingWithDigit('1123')).toEqual(true);
+  done();
+});
+
 it('testGetMaxPrim', done => {
   expect(Helpers.getMaxPrimes(1)).toEqual(1);
   expect(Helpers.getMaxPrimes(2)).toEqual(2);

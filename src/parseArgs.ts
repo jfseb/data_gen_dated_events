@@ -11,7 +11,7 @@ import {LocalDate } from  "@js-joda/core";
 import * as seedrandom from 'seedrandom';
 
 
-var SAMPLES = ["A1", "ASTANTA", "EASTBU", "JBAKER", "TWALKE" ];
+var SAMPLES = ["A1", "ASANTA", "EASTBU", "JBAKER", "TWALKE" ];
 
 export class ParsedArgs {
 	nrpersons : number;
@@ -83,8 +83,8 @@ export function getOutputParams( args: ParsedArgs ) : OutputParams {
 	o.samplesMONAG = [];
 	o.samplesRANGE = [];
 	if ( args.addInputSamples ) {
-		o.samplesMONAG = SAMPLES.map( a => "MONAG_SAMPLE_" + a + ".S.csv");
-		o.samplesRANGE = SAMPLES.map( a => "RANGE_SAMPLE_" + a + ".S.csv");
+		o.samplesMONAG = SAMPLES.map( a => "input/MONAG_SAMPLE_" + a + ".S.csv");
+		o.samplesRANGE = SAMPLES.map( a => "input/RANGE_SAMPLE_" + a + ".S.csv");
 	}
 	return o;
 }

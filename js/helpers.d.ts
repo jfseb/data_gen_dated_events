@@ -125,6 +125,6 @@ export declare function genUSERHierarchy(nrpers: number): void;
  * @param done
  */
 export declare function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData: boolean, samples: string[], filename2: string, done: any): any;
-export declare function appendCleansing(filename1: string, isFirst: boolean, wsOut: any): any;
+export declare function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: any): any;
 export declare function genUser(i: number): string;
 export declare function genUSERHierarchyW(ws: any, nrpers: number): void;

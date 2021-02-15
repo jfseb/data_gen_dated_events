@@ -596,8 +596,6 @@ function writeChangeLineRANGE(ws, dateIdx : LocalDate, pers: Person, nextHire, n
   } else if ( isHIRE(nextPers,nextHire)) {
     //nextPers.lastHired = dateIdx;
     pers.prevRangeEnd = copyDate(dateIdx).minusDays(1); // SET THIS!
-
-
     // do nothing, will be captured next
   } else {
     // close previous record, always
@@ -615,7 +613,6 @@ function isStopRecordsRequested(pars: GenParams) {
 function isNoZeroRequested(pars: GenParams) {
   return ( pars.optsMONAG && pars.optsMONAG.noZero);
 }
-
 
 // we write a record with all measures zero (or null?)
 function writeSTOPRecordAfter(ws, pers : Person, d : LocalDate, pars: GenParams, comment : string ) {
@@ -804,12 +801,12 @@ export function genUSERHierarchy(nrpers : number ) {
 }
 
 function isDigit(char : string) {
-  return "0123456789".indexOf(char) > 0;
+  return "0123456789".indexOf(char) >= 0;
 }
 
-function isDigitStartLine(line : string) {
+export function isLineStartingWithDigit(line : string) {
   var lines = ''+line;
-  return lines.length > 0 &&  !isDigit(lines.charAt(0));
+  return lines.length > 0 &&  isDigit(lines.charAt(0));
 }
 
 /**
@@ -824,6 +821,7 @@ export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData
   var first = true;
   if ( addData ) {
     samples.forEach( sn => {
+      console.log(' appending ' + sn);
       appendCleansing(sn, first, wsOut);
       first = false;
     });
@@ -832,15 +830,20 @@ export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData
   wsOut.ws.on('finish', () => { done(); });
   wsOut.ws.end();
 }
-export function appendCleansing(filename1: string, isFirst: boolean, wsOut: any) : any {
-
+export function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: any) : any {
   const liner = new lineByLine(filename1);
   var line = "";
   var nr = 0;
   while( line = liner.next() ){
-    if ( line && !(''+line).startsWith('#') && (nr < 1 || isDigitStartLine(line))) {
+    var isDataLine = line && isLineStartingWithDigit(line);
+    var isCommentLine = line && (''+line).startsWith('#');
+    var isFirstHeaderLine = ( nr < 1 ) && !isCommentLine && !isDataLine;
+
+    if ( isDataLine || (isFirstHeaderLine && isFirstFile)) {
       wsOut.write( ('' + line).replace(/;\s+/g,";") ).write('\n');
       ++nr;
+    } else {
+      console.log(' dropping ' + isDataLine + ' ' + isFirstHeaderLine + ' ' + isCommentLine + ' ' + line);
     }
   }
 }
