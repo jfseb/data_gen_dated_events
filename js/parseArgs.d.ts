@@ -3,6 +3,8 @@ export declare class ParsedArgs {
     nrpersons: number;
     zero: boolean;
     stopRecords: boolean;
+    startRecords: boolean;
+    addInputSamples: boolean;
     output: string;
     period: number;
     userHierarchy: boolean;
@@ -13,8 +15,10 @@ export declare class OutputParams {
     AVG_NEXT: number;
     FILENAME_MONAG: string;
     FILENAME_MONAG_C: string;
+    samplesMONAG: string[];
     FILENAME_RANGE: string;
     FILENAME_RANGE_C: string;
+    samplesRANGE: string[];
     NOZERO: boolean;
     STOPRECORDs: boolean;
 }

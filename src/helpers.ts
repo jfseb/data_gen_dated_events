@@ -14,6 +14,8 @@ export const EXCELOFFSET = 25569;
 
 import {LocalDate } from  "@js-joda/core";
 import { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } from 'constants';
+import { sampleSize } from 'lodash';
+import { Console } from 'console';
 
 export function dateToDayIndex(d : LocalDate ) : number {
   return  d.toEpochDay() + EXCELOFFSET;
@@ -81,6 +83,7 @@ export function getWS(filename: string) : WSWrap2 {
 export class OptsMONAG {
   noZero : boolean;
   stopRecords : boolean;
+  startRecords : boolean;
 }
 
 export class GenParams {
@@ -97,6 +100,7 @@ export class GenParams {
   lastDate : LocalDate;
   random : any;
   wsMONAG : any;
+  addInputSamples : boolean;
   optsMONAG? : OptsMONAG;
   wsRANGE : any;
   optsRANGE : any;
@@ -159,20 +163,20 @@ function getPlainEventReason(pars: GenParams) : string {
   return "P" + padZeros((Math.floor(pars.random.otherRandom(4) * 100) % 10),2);
 }
 
-export function isHireER(er : string) {
-  return (er.charAt(0) == "H") ? "1" : "0";
+export function isHireER( er : string ) :number {
+  return (er.charAt(0) == "H") ? 1 : 0;
 }
 
-export function isTermER(er : string) {
-  return (er.charAt(0) == "T") ? "1" : "0";
+export function isTermER( er : string ) : number {
+  return (er.charAt(0) == "T") ? 1 : 0;
 }
 
-export function isOtherER(er : string) {
-  return ((!isHireER(er) && !isTermER(er))) ? "1" : "0";
+export function isOtherER( er : string ) : number {
+  return ((!isHireER(er)  && !isTermER(er)) ? 1 : 0);
 }
 
 
-function getHireTermEventReason(pars : GenParams, priorHired: number ) {
+function getHireTermEventReason( pars : GenParams, priorHired: number ) {
   if ( priorHired ) {
     return getTermEventReason(pars);
   } else {
@@ -180,14 +184,14 @@ function getHireTermEventReason(pars : GenParams, priorHired: number ) {
   }
 }
 
-function getOtherEventReason(pars: GenParams, pers: Person, nl: string) {
+function getOtherEventReason( pars: GenParams, pers: Person, nl: string ) {
   if ( pers.location != nl ) {
     return getLocationEventReason(pars);
   }
   return getPlainEventReason(pars);
 }
 
-function nextLocation(pars: GenParams, pers : Person) {
+function nextLocation( pars: GenParams, pers : Person ) {
   if( pars.random.random() < pars.LOCCHANGE) {
     return getLocation(pars);
   }
@@ -205,7 +209,7 @@ function nextFTE(pars: GenParams, pers : Person) {
 }
 
 
-function getNextESTAT(pars: GenParams, pers : Person, key : string) {
+function getNextESTAT( pars: GenParams, pers : Person, key : string ) {
 //  pars.randomOD[key]();
   if( pars.randomOD[key].random() < pars.ESTATCHANGE) {
     return getESTAT(pars, key);
@@ -415,14 +419,13 @@ export function writeRecord(ws, dateIdx : LocalDate, pers : Person, pars : GenPa
 
   // we can use this as MOVE_OUT or TERM
   var dateIdxP1 = copyDate(dateIdx).plusDays(1);
-  if( (""+dateIdxP1) == (""+pers.lastEventDate) ) {
-    var hasER = ("1" == isTermER(pers.eventReason)) || ("1" == isOtherER(pers.eventReason));
+  if( dateIdxP1.toEpochDay() == (pers.lastEventDate && pers.lastEventDate.toEpochDay()) ) {
+    var hasER = isTermER(pers.eventReason) || isOtherER(pers.eventReason);
     ws.write("0;" +
-             isTermER(pers.eventReason) + ";0;" +
-             isOtherER(pers.eventReason) + ";" +
+        isTermER(pers.eventReason) + ";0;" +
+        isOtherER(pers.eventReason) + ";" +
         (hasER ? (pers.eventReason + ";") : ";  ") + "\"" + pers.gender + "\";" + comment + "\n");
-  }
-  else {
+  } else {
     ws.write("0;0;0;0;;  \"" + pers.gender + "\";" + comment + "\n");
   }
   pers.prevDateEnd = copyDate(dateIdx);
@@ -458,6 +461,63 @@ export function writeRecord0(ws, dateIdx : LocalDate, pers : Person,  comment: s
   //  ws.write('0').write(';');
   //}
   ws.write("0;0;0;0;;  \"" + pers.gender + "\";" + comment + "\n");
+}
+
+
+
+/**
+ * This function does mutate pers, use a clone if not desired!
+ * @param ws
+ * @param dateIdx
+ * @param pers
+ * @param comment
+ */
+export function writeRecordHIRE(ws, dateIdx : LocalDate, pers : Person,  comment: string )
+{
+  var startIdx = copyDate(dateIdx);
+  var eom = isEOM(dateIdx);
+  ws.write(padSpaceQ(pers.user,5)).write(';');
+  ws.write(padSpaceQ(pers.location,20)).write(';');
+  ws.write(padSpaceQ(pers.ESTAT,1)).write(';'); // we always write this, needed for STOP records
+  writeTripel(ws, "0.0", "0.0", false); // pers.hiredSOM ? "1.0": "0.0" ,pers.hired ? "1.0": "0.0",isEOM(dateIdx));
+  var daysInPeriod = "0.0"; //startIdx.until(dateIdx).days() + 1;
+  ws.write(padSpace(0,2)).write(';'); //DAYSWORKED
+  writeTripel(ws, toDec1(0),toDec1(0),isEOM(dateIdx));
+  ws.write(padSpace(0,4)).write(';'); // FTEWORKED
+  ws.write(" 0; 0; 0;");
+  //writeTenure(ws, dateIdx, pers, eom); // CHECK WHETHER MEASURE OR DIM
+  ws.write(" 0; 0; 0;")
+  //writeAge(ws, dateIdx, pers, eom);
+  ws.write("0;");
+  ws.write("1;0;0;0;" + pers.eventReason +";\"" + pers.gender + "\";" + comment + "\n");
+}
+
+
+/**
+ * This function does mutate pers, use a clone if not desired!
+ * @param ws
+ * @param dateIdx
+ * @param pers
+ * @param comment
+ */
+export function writeRecordMOVEIN(ws, dateIdx : LocalDate, pers : Person,  comment: string )
+{
+  var startIdx = copyDate(dateIdx);
+  var eom = isEOM(dateIdx);
+  ws.write(padSpaceQ(pers.user,5)).write(';');
+  ws.write(padSpaceQ(pers.location,20)).write(';');
+  ws.write(padSpaceQ(pers.ESTAT,1)).write(';'); // we always write this, needed for STOP records
+  writeTripel(ws, "0.0", "0.0", false); // pers.hiredSOM ? "1.0": "0.0" ,pers.hired ? "1.0": "0.0",isEOM(dateIdx));
+  var daysInPeriod = "0.0"; //startIdx.until(dateIdx).days() + 1;
+  ws.write(padSpace(0,2)).write(';'); //DAYSWORKED
+  writeTripel(ws, toDec1(0),toDec1(0),isEOM(dateIdx));
+  ws.write(padSpace(0,4)).write(';'); // FTEWORKED
+  ws.write(" 0; 0; 0;");
+  //writeTenure(ws, dateIdx, pers, eom); // CHECK WHETHER MEASURE OR DIM
+  ws.write(" 0; 0; 0;")
+  //writeAge(ws, dateIdx, pers, eom);
+  ws.write("0;");
+  ws.write("0;0;1;0;" + padSpaceQ(pers.eventReason,5) +";\"" + pers.gender + "\";" + comment + "\n");
 }
 
 function writeStateLineRANGE(ws, dateIdx : LocalDate, pers : Person, nextHire, nextLoc, nextFTE, comment:string) {
@@ -515,7 +575,7 @@ function closePreviousRange(ws, dateIdx:LocalDate, pers: Person, pars : GenParam
   writeRecord(ws, dmin1, pers, pars, comment);
 }
 
-function writeChangeLineRANGE(ws,dateIdx : LocalDate, pers: Person, nextHire, nextLoc, nextFTE, nextESTAT, pars : GenParams, comment:string) {
+function writeChangeLineRANGE(ws, dateIdx : LocalDate, pers: Person, nextHire, nextLoc, nextFTE, nextESTAT, pars : GenParams, comment:string) {
   if( ws == undefined) {
     return;
   }
@@ -531,11 +591,13 @@ function writeChangeLineRANGE(ws,dateIdx : LocalDate, pers: Person, nextHire, ne
   var isterm = isTERM(nextPers, nextHire);
   if ( isterm ) {
     // close previous record
-    closePreviousRange(ws, dateIdx, nextPers, pars,  "termclose-1" +  dateIdx + ' ' +  comment);
+    closePreviousRange(ws, dateIdx, nextPers, pars,  "termclose-1@" +  dateIdx + ' ' +  comment);
     pers.prevRangeEnd = copyDate(dateIdx).minusDays(1);
   } else if ( isHIRE(nextPers,nextHire)) {
     //nextPers.lastHired = dateIdx;
     pers.prevRangeEnd = copyDate(dateIdx).minusDays(1); // SET THIS!
+
+
     // do nothing, will be captured next
   } else {
     // close previous record, always
@@ -588,11 +650,20 @@ function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers :Person, nextHire, n
     pers.hiredPrev = 0;
     //pers.lastTerm = dateIdx;
   } else if ( isHIRE(pers,nextHire)) {
-    pers.lastHired = dateIdx;
-    pers.prevDateEnd = copyDate(dateIdx).minusDays(1);
-    // added
-    pers.ftePrev = pers.fte;
-    pers.hiredPrev = 1;
+       // write HIRE event line ->
+       pers.lastHired = dateIdx;
+       pers.prevDateEnd = copyDate(dateIdx).minusDays(1);
+       // added
+       pers.ftePrev = pers.fte;
+       pers.hiredPrev = 1;
+    if ( pars.optsMONAG.startRecords ) {
+      var dp1 = copyDate(dateIdx).plusDays(2);
+      writeDay(ws, dp1, dateIdx );
+      pers.hired = nextHire;
+      pers.location = nextLoc;
+      pers.fte = nextFTE;
+      writeRecordHIRE(ws, dateIdx, pers, "hire@" + dateIdx + ' ' + comment);
+    }
     // do nothing, will be captured next
   } else {
     // close previous record
@@ -600,12 +671,20 @@ function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers :Person, nextHire, n
       // unless we already closed it by a month record
       var dmin1 = copyDate(dateIdx).minusDays(1);
       writeDay(ws, pers.prevDateEnd, dmin1);
-      writeRecord(ws, dmin1, pers, pars, "perclose-1 from " + dateIdx + ' '+  comment);
+      writeRecord(ws, dmin1, pers, pars, "prevclose from " + dateIdx + ' '+  comment);
       memorizeSOM(dmin1,pers);
     }
     // always write a stop record if reqested
     if ( isStopRecordsRequested(pars)) {
       writeSTOPRecordAfter(ws,pers,dateIdx, pars,  "stopAfteve@" +  dateIdx + ' ' + comment);
+    }
+    if ( pars.optsMONAG.startRecords && pers.hired) {
+      var dp1 = copyDate(dateIdx).plusDays(2);
+      writeDay(ws, dp1, dateIdx );
+      pers.hired = nextHire;
+      pers.location = nextLoc;
+      pers.fte = nextFTE;
+      writeRecordMOVEIN(ws, dateIdx, pers, "movein@" + dateIdx + ' ' + comment);
     }
   }
   pers.hired = nextHire;
@@ -739,9 +818,22 @@ function isDigitStartLine(line : string) {
  * @param filename2
  * @param done
  */
-export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, filename2 : string, done : any ) : any {
+export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData: boolean, samples : string[], filename2 : string, done : any ) : any {
   //var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
   var wsOut = getWS(filename2);
+  var first = true;
+  if ( addData ) {
+    samples.forEach( sn => {
+      appendCleansing(sn, first, wsOut);
+      first = false;
+    });
+  }
+  appendCleansing(filename1, first, wsOut);
+  wsOut.ws.on('finish', () => { done(); });
+  wsOut.ws.end();
+}
+export function appendCleansing(filename1: string, isFirst: boolean, wsOut: any) : any {
+
   const liner = new lineByLine(filename1);
   var line = "";
   var nr = 0;
@@ -751,8 +843,6 @@ export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, filenam
       ++nr;
     }
   }
-  wsOut.ws.on('finish', () => { done(); });
-  wsOut.ws.end();
 }
 
 export function genUser(i : number) : string {

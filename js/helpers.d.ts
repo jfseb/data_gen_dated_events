@@ -15,6 +15,7 @@ export declare function getWS(filename: string): WSWrap2;
 export declare class OptsMONAG {
     noZero: boolean;
     stopRecords: boolean;
+    startRecords: boolean;
 }
 export declare class GenParams {
     NRPERS: number;
@@ -30,6 +31,7 @@ export declare class GenParams {
     lastDate: LocalDate;
     random: any;
     wsMONAG: any;
+    addInputSamples: boolean;
     optsMONAG?: OptsMONAG;
     wsRANGE: any;
     optsRANGE: any;
@@ -56,9 +58,9 @@ export declare class Person {
     prevDateEnd: LocalDate;
     prevRangeEnd: LocalDate;
 }
-export declare function isHireER(er: string): "1" | "0";
-export declare function isTermER(er: string): "1" | "0";
-export declare function isOtherER(er: string): "1" | "0";
+export declare function isHireER(er: string): number;
+export declare function isTermER(er: string): number;
+export declare function isOtherER(er: string): number;
 export declare function copyDate(d: LocalDate): LocalDate;
 export declare function isEOQ(d: LocalDate): boolean;
 export declare function isEOY(d: LocalDate): boolean;
@@ -96,6 +98,22 @@ export declare function writeRecord(ws: any, dateIdx: LocalDate, pers: Person, p
  * @param comment
  */
 export declare function writeRecord0(ws: any, dateIdx: LocalDate, pers: Person, comment: string): void;
+/**
+ * This function does mutate pers, use a clone if not desired!
+ * @param ws
+ * @param dateIdx
+ * @param pers
+ * @param comment
+ */
+export declare function writeRecordHIRE(ws: any, dateIdx: LocalDate, pers: Person, comment: string): void;
+/**
+ * This function does mutate pers, use a clone if not desired!
+ * @param ws
+ * @param dateIdx
+ * @param pers
+ * @param comment
+ */
+export declare function writeRecordMOVEIN(ws: any, dateIdx: LocalDate, pers: Person, comment: string): void;
 export declare function isHireChange(pars: GenParams): boolean;
 export declare function genPerson(p: any, pars: GenParams): void;
 export declare function getMaxPrimes(nr: number): number;
@@ -106,6 +124,7 @@ export declare function genUSERHierarchy(nrpers: number): void;
  * @param filename2
  * @param done
  */
-export declare function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, filename2: string, done: any): any;
+export declare function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData: boolean, samples: string[], filename2: string, done: any): any;
+export declare function appendCleansing(filename1: string, isFirst: boolean, wsOut: any): any;
 export declare function genUser(i: number): string;
 export declare function genUSERHierarchyW(ws: any, nrpers: number): void;

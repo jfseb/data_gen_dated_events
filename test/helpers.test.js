@@ -266,6 +266,7 @@ it('testGenPerson1', done => {
   pars.wsMONAG = wsMONAG;
   pars.wsRANGE = wsRANGE;
   initParsRandom(pars);
+  pars.optsMONAG = {};
   Helpers.writeHeader(wsMONAG);
   Helpers.genPerson('P1', pars);
   writeToFile('testData/gp1.monag.csv.tmp',wsMONAG);
@@ -286,6 +287,7 @@ it('testGenPersonB', done => {
   var d2 = LocalDate.of(2022,6,1);
   var d2Idx = Helpers.dateToDayIndex(d2);
   var pars = _.clone(DEFPARS);
+  pars.optsMONAG = { };
   initParsRandom(pars);
   pars.wsMONAG = wsMONAG;
   pars.wsRANGE = wsRANGE;
@@ -293,13 +295,13 @@ it('testGenPersonB', done => {
   Helpers.writeHeader( wsRANGE );
   Helpers.genPerson( 'P1', pars );
   writeToFile('testData/gp1.monag2.csv.tmp', wsMONAG);
-  writeToFile('testData/gp1.range2.csv.tmp', wsRANGE);
+  writeToFile('testData/gp1.rangeB.csv.tmp', wsRANGE);
   {
     var expMONAG = readFromFile('testData/gp1.monag.csv') + '';
     expect( wsMONAG.toString().replace(/\r\n/g,"\n") ).toEqual( expMONAG.replace(/\r\n/g,"\n") );
   }
   {
-    var expRANGE = readFromFile('testData/gp1.range.csv') + '';
+    var expRANGE = readFromFile('testData/gp1.rangeB.csv') + '';
     expect( wsRANGE.toString().replace(/\r\n/g,"\n") ).toEqual( expRANGE.replace(/\r\n/g,"\n") );
   }
   done();
@@ -313,7 +315,8 @@ it('testGenPersonStopNZ', done => {
   initParsRandom(pars);
   pars.optsMONAG = {
     noZero : true,
-    stopRecords : true
+    stopRecords : true,
+    startRecords : true,
   };
   pars.wsMONAG = wsMONAG;
   pars.wsRANGE = wsRANGE;
@@ -323,13 +326,13 @@ it('testGenPersonStopNZ', done => {
   }
   Helpers.genPerson('P1', pars);
   writeToFile('testData/gp1.monagNZS.csv.tmp',wsMONAG);
-  writeToFile('testData/gp1.range.csv.tmp',wsRANGE);
+  writeToFile('testData/gp1.rangeNZS.csv.tmp',wsRANGE);
   {
     var expMONAG = readFromFile('testData/gp1.monagNZS.csv') + '';
     expect(wsMONAG.toString().replace(/\r\n/g,"\n")).toEqual(expMONAG.replace(/\r\n/g,"\n"));
   }
   {
-    var expRANGE = readFromFile('testData/gp1.range.csv') + '';
+    var expRANGE = readFromFile('testData/gp1.rangeNZS.csv') + '';
     expect(wsRANGE.toString().replace(/\r\n/g,"\n")).toEqual(expRANGE.replace(/\r\n/g,"\n"));
   }
   done();
@@ -370,9 +373,11 @@ it('testGenHierarchy', done => {
 
 it('testWSWrap', done => {
   var u = Helpers.getWS('testData/xx.tmp');
+  u.write('ABC;DEF;\n');
+  u.write('# ABC;\n');
   u.write('0; 0; 000; 123; "  ";0;');
   u.ws.on('finish', () => {
-    Helpers.cleanseWSCommentsRepeatedHeaderInFile('testData/xx.tmp', 'testData/cleansed.S.csv.tmp', function() {
+    Helpers.cleanseWSCommentsRepeatedHeaderInFile('testData/xx.tmp', false, [], 'testData/cleansed.S.csv.tmp', function() {
       {
         var expDim = readFromFile('testData/cleansed.S.csv') + '';
         var actDim = readFromFile('testData/cleansed.S.csv.tmp') + '';
@@ -387,58 +392,66 @@ it('testWSWrap', done => {
 
 
 it('testCleanseESTBUN', done => {
-  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_EASTBU.S.csv', 'input/MONAG_SAMPLE_EASTBU.S.C.csv', function() {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_EASTBU.S.csv',false, [], 'input/MONAG_SAMPLE_EASTBU.S.C.csv', function() {
     done();
   });
 }
 );
 
 it('testCleanseASANTA', done => {
-  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_ASANTA.S.csv', 'input/MONAG_SAMPLE_ASTANTA.S.C.csv', function() {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_ASANTA.S.csv',false, [], 'input/MONAG_SAMPLE_ASTANTA.S.C.csv', function() {
       done();
   });
 }
 );
 
 it('testCleanseA1', done => {
-  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_A1.S.csv', 'input/MONAG_SAMPLE_A1.S.C.csv', function() {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_A1.S.csv', false, [], 'input/MONAG_SAMPLE_A1.S.C.csv', function() {
     done();
   });
 }
 );
 
 it('testCleanseJBAKER', done => {
-  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_JBAKER.S.csv', 'input/MONAG_SAMPLE_JBAKER.S.C.csv', function() {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_JBAKER.S.csv', false, [], 'input/MONAG_SAMPLE_JBAKER.S.C.csv', function() {
       done();
   });
 }
 );
 
 it('testCleanseTWALKER', done => {
-  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_TWALKE.S.csv', 'input/MONAG_SAMPLE_TWALKE.C.csv', function() {
+  Helpers.cleanseWSCommentsRepeatedHeaderInFile('input/MONAG_SAMPLE_TWALKE.S.csv', false, [], 'input/MONAG_SAMPLE_TWALKE.S.C.csv', function() {
       done();
   });
 }
 );
 
 it('testParseArgs', done => {
-  expect(ParseArgs.parseArguments('-n 3 -s -u')).toEqual( { nrpersons: 3, period : 150, stopRecords : true, userHierarchy : true, zero : false, addSamples: false } );
-  expect(ParseArgs.parseArguments('-n 34 --zero --period 413')).toEqual( { nrpersons: 34, period : 413, stopRecords : false, userHierarchy : false, zero : true, addSamples: false } );
+  expect(ParseArgs.parseArguments('-n 3 -s -u')).toEqual( { nrpersons: 3, period : 150, stopRecords : true, userHierarchy : true, zero : false, addInputSamples: false, startRecords : false } );
+  expect(ParseArgs.parseArguments('-n 34 --zero --period 413')).toEqual( { nrpersons: 34, period : 413, stopRecords : false, userHierarchy : false, zero : true, addInputSamples: false, startRecords: false } );
+  done();
+}
+);
+
+it('testGetOutputParamsA', done => {
+  var o = ParseArgs.getOutputParams( { nrpersons: 3, period: 222, zero: true, stopRecords : true, startRecords: true} );
+  expect(o.FILENAME_MONAG).toEqual("MONAG_0222_000003.Z.S.A.csv");
   done();
 }
 );
 
 it('testGetOutputParams', done => {
-  var o = ParseArgs.getOutputParams( { nrpersons: 3, period: 222, zero: true, stopRecords : true} );
+  var o = ParseArgs.getOutputParams( { nrpersons: 3, period: 222, zero: true, stopRecords : true, startRecords: false} );
   expect(o.FILENAME_MONAG).toEqual("MONAG_0222_000003.Z.S.csv");
   done();
 }
 );
 
 it('testGetParams1', done => {
-  var o = ParseArgs.GetParams1( { nrpersons: 4, period : 222, nozero: true, stopRecords : true} );
+  var o = ParseArgs.GetParams1( { nrpersons: 4, period : 222, nozero: true, stopRecords : true, startRecords : true} );
   expect(o.NRPERS).toEqual(4);
   expect(o.optsMONAG.stopRecords).toEqual(true);
+  expect(o.optsMONAG.startRecords).toEqual(true);
   expect(o.optsMONAG.noZero).toEqual(true);
   done();
 });
