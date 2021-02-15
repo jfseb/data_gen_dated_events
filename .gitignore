@@ -28,9 +28,9 @@ coverage
 *.csv.tmp
 *.csv.bak
 
-MONAG*.csv
-DIM*.csv
-RANGE*.csv
+./MONAG*.csv
+./DIM*.csv
+./RANGE*.csv
 
 # nyc test coverage
 .nyc_output
