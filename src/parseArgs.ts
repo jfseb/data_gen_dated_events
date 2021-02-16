@@ -11,7 +11,11 @@ import {LocalDate } from  "@js-joda/core";
 import * as seedrandom from 'seedrandom';
 
 
-var SAMPLES = ["A1", "ASANTA", "EASTBU", "JBAKER", "TWALKE" ];
+var SAMPLES = ["ASANTA", "EASTBU", "TWALKE", "A1",  "JBAKER"];
+
+export function getInputSamples() {
+	return SAMPLES;
+}
 
 export class ParsedArgs {
 	nrpersons : number;

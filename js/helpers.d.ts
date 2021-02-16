@@ -114,10 +114,21 @@ export declare function writeRecordHIRE(ws: any, dateIdx: LocalDate, pers: Perso
  * @param comment
  */
 export declare function writeRecordMOVEIN(ws: any, dateIdx: LocalDate, pers: Person, comment: string): void;
+export declare function getStringBuilder(): any;
 export declare function isHireChange(pars: GenParams): boolean;
 export declare function genPerson(p: any, pars: GenParams): void;
 export declare function getMaxPrimes(nr: number): number;
-export declare function genUSERHierarchy(nrpers: number): void;
+export declare function isLineStartingWithDigit(line: string): boolean;
+export declare function isDateLine(line: string): boolean;
+export declare function splitDateLine(line: string): string[];
+export declare function reIndexLine(line: string): any;
+/**
+ * Also strips comments lines with #
+ * @param filename1
+ * @param filename2
+ * @param done
+ */
+export declare function reIndexTime(filename1: string, filename2: string, done: any): any;
 /**
  * Also strips comments lines with #
  * @param filename1
@@ -125,6 +136,7 @@ export declare function genUSERHierarchy(nrpers: number): void;
  * @param done
  */
 export declare function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData: boolean, samples: string[], filename2: string, done: any): any;
-export declare function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: any): any;
+export declare function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: any, reindex: boolean): any;
 export declare function genUser(i: number): string;
 export declare function genUSERHierarchyW(ws: any, nrpers: number): void;
+export declare function genUSERHierarchy(nrpers: number): void;

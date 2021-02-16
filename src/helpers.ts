@@ -13,7 +13,7 @@ import * as seedrandom from 'seedrandom';
 export const EXCELOFFSET = 25569;
 
 import {LocalDate } from  "@js-joda/core";
-import { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } from 'constants';
+import { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS, WSAEDQUOT } from 'constants';
 import { sampleSize } from 'lodash';
 import { Console } from 'console';
 
@@ -283,7 +283,7 @@ export function daysInMonth(dateIdx : LocalDate) {
 
 export function writeHeader(ws) {
   ws.write("YEAR;QUART;CALMONTHIC;CALMONTHI;CALMONTH;CALMONTHS;START_DATE_IDX;END_DATE_IDX;ISEOM;ISEOQ;ISEOY;DAYSINMONTH;START_DATE;END_DATE;")
-  ws.write("USER;LOCATION;ESTAT;HC;HC_SOM;HC_EOM;DAYSWORKED;FTE;FTE_SOM;FTE_EOM;FTEWORKED;TENURE;TENURE_SOM;TENURE_EOM;AGE;AGE_SOM;AGE_EOM;HC_EOMS;HIRE;TERM;MOVE_OUT;MOVE_IN;EVRS;GNDR;X\n")
+  ws.write("USER;LOCATION;ESTAT;HC;HC_SOM;HC_EOM;DAYSWORKED;FTE;FTE_SOM;FTE_EOM;FTEWORKED;TENURE;TENURE_SOM;TENURE_EOM;AGE;AGE_SOM;AGE_EOM;HC_EOMS;HIRE;TERM;MOVE_IN;MOVE_OUT;EVRS;GNDR;X\n")
 }
 
 export function makeQuarter(d : LocalDate) {
@@ -620,6 +620,25 @@ function writeSTOPRecordAfter(ws, pers : Person, d : LocalDate, pars: GenParams,
   writeRecord0(ws, d, pers, comment);
 }
 
+export function getStringBuilder() : any {
+  class Obj  {
+    s: string;
+    constructor()
+    {
+      this.s = '';
+    }
+    write(a) {
+      this.s += '' + a;
+      return this;
+    }
+    toString() {
+      return ''+ this.s;
+    }
+  };
+  return new Obj();
+}
+
+
 // there is a change @date , new values are to the right;
 // this i called on a change in values.
 function writeChangeLineMONAG(ws, dateIdx : LocalDate, pers :Person, nextHire, nextLoc, nextFTE, nextESTAT, pars : GenParams, comment:string) {
@@ -794,11 +813,7 @@ export function getMaxPrimes(nr: number) : number {
   return remain;
 }
 
-export function genUSERHierarchy(nrpers : number ) {
-  var ws = getWS( "DIM_USER_" + padZeros(nrpers,6) + ".csv");
-  genUSERHierarchyW(ws,nrpers);
-  ws.ws.end();
-}
+
 
 function isDigit(char : string) {
   return "0123456789".indexOf(char) >= 0;
@@ -809,6 +824,54 @@ export function isLineStartingWithDigit(line : string) {
   return lines.length > 0 &&  isDigit(lines.charAt(0));
 }
 
+const re = new RegExp( /^(.*);(\d{4}-\d{2}-\d{2});(\d{4}-\d{2}-\d{2});(.*)$/);
+
+export function isDateLine(line : string) : boolean {
+  return !!re.exec(line);
+}
+
+export function splitDateLine(line : string) : string[] {
+  var res = re.exec(line);
+  //console.log(res);
+  return [res[1],res[2],res[3],res[4]];
+}
+
+export function reIndexLine(line : string) {
+  var isDateLn = line && isDateLine('' + line);
+  if ( isDateLn ) {
+    var line = ''+line;
+    var tags = splitDateLine(line);
+    var prevDateEnd = LocalDate.parse(tags[1]).minusDays(1);
+    var dateIdx = LocalDate.parse(tags[2]);
+    var sb = getStringBuilder();
+    writeDay(sb, prevDateEnd, dateIdx);
+    sb.write(tags[3]);
+    return sb.toString();
+  } else {
+    return '' + line;
+  }
+}
+
+/**
+ * Also strips comments lines with #
+ * @param filename1
+ * @param filename2
+ * @param done
+ */
+export function reIndexTime(filename1: string, filename2 : string, done : any ) : any {
+  var wsOut = getWS(filename2);
+  const liner = new lineByLine(filename1);
+  var line = "";
+  while( line = liner.next() ) {
+    line = reIndexLine(line);
+    wsOut.write(line + '\n');
+  }
+  wsOut.ws.on('finish', () => { done(); });
+  wsOut.ws.end();
+}
+
+
+
 /**
  * Also strips comments lines with #
  * @param filename1
@@ -816,21 +879,21 @@ export function isLineStartingWithDigit(line : string) {
  * @param done
  */
 export function cleanseWSCommentsRepeatedHeaderInFile(filename1: string, addData: boolean, samples : string[], filename2 : string, done : any ) : any {
-  //var ln = fs.readFileSync(filename1, { encoding : 'utf-8'});
   var wsOut = getWS(filename2);
   var first = true;
   if ( addData ) {
     samples.forEach( sn => {
       console.log(' appending ' + sn);
-      appendCleansing(sn, first, wsOut);
+      appendCleansing(sn, first, wsOut, true);
       first = false;
     });
   }
-  appendCleansing(filename1, first, wsOut);
+  appendCleansing(filename1, first, wsOut, false);
   wsOut.ws.on('finish', () => { done(); });
   wsOut.ws.end();
 }
-export function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: any) : any {
+
+export function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: any, reindex: boolean) : any {
   const liner = new lineByLine(filename1);
   var line = "";
   var nr = 0;
@@ -838,13 +901,15 @@ export function appendCleansing(filename1: string, isFirstFile: boolean, wsOut: 
     var isDataLine = line && isLineStartingWithDigit(line);
     var isCommentLine = line && (''+line).startsWith('#');
     var isFirstHeaderLine = ( nr < 1 ) && !isCommentLine && !isDataLine;
-
     if ( isDataLine || (isFirstHeaderLine && isFirstFile)) {
-      wsOut.write( ('' + line).replace(/;\s+/g,";") ).write('\n');
+      if( reindex) {
+        line = reIndexLine(line);
+      }
+      wsOut.write( ('' + line).replace(/;\s+/g,";").replace(/\s+;/g,";") ).write('\n');
       ++nr;
-    } else {
+    }/* else {
       console.log(' dropping ' + isDataLine + ' ' + isFirstHeaderLine + ' ' + isCommentLine + ' ' + line);
-    }
+    }*/
   }
 }
 
@@ -887,3 +952,8 @@ export function genUSERHierarchyW(ws : any, nrpers : number ) {
   }
 }
 
+export function genUSERHierarchy(nrpers : number ) {
+  var ws = getWS( "DIM_USER_" + padZeros(nrpers,6) + ".csv");
+  genUSERHierarchyW(ws,nrpers);
+  ws.ws.end();
+}

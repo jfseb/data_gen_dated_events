@@ -1,4 +1,5 @@
 import * as Helpers from './helpers';
+export declare function getInputSamples(): string[];
 export declare class ParsedArgs {
     nrpersons: number;
     zero: boolean;

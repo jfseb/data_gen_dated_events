@@ -10,20 +10,7 @@ var _ = require('lodash');
 var seedrandom = require('seedrandom');
 
 function fakeWS() {
-  class Obj  {
-   constructor()
-   {
-     this.s = '';
-   }
-   write(a) {
-     this.s += '' + a;
-     return this;
-    }
-    toString() {
-      return ''+ this.s;
-    }
-  };
-  return new Obj();
+  return Helpers.getStringBuilder();
 }
 
 const DATE2020_06_01 = (LocalDate.of(2020,6,1));
@@ -338,13 +325,18 @@ it('testGenPersonStopNZ', done => {
   done();
 });
 
-
 it('isDigitStartLine', done => {
-  expect(Helpers.isLineStartingWithDigit('0123')).toEqual(true);
-  expect(Helpers.isLineStartingWithDigit('1123')).toEqual(true);
-  expect(Helpers.isLineStartingWithDigit('AB')).toEqual(false);
-  expect(Helpers.isLineStartingWithDigit('#')).toEqual(false);
-  expect(Helpers.isLineStartingWithDigit('1123')).toEqual(true);
+  var x = '2020;2020_Q2;244;202004;202004;202004;43922;43951;1.0;0.0;0.0;30;2020-04-01;2020-04-30;"P00001";"Chicago"             ;"A";1.0;1.0;1.0;30;1.0;1.0;1.0;  30; 1; 0; 1;29;29;29;1;0;0;0;0;;  "F";stEOM'
+
+  expect(Helpers.isDateLine('0123')).toEqual(false);
+  expect(Helpers.isDateLine(x)).toEqual(true);
+
+  expect(Helpers.splitDateLine(x)[0]).toEqual('2020;2020_Q2;244;202004;202004;202004;43922;43951;1.0;0.0;0.0;30');
+  expect(Helpers.splitDateLine(x)[1]).toEqual('2020-04-01');
+  var u = LocalDate.parse(Helpers.splitDateLine(x)[1]);
+  expect(u.toString()).toEqual('2020-04-01');
+  expect(Helpers.splitDateLine(x)[2]).toEqual('2020-04-30');
+  expect(Helpers.splitDateLine(x)[3]).toEqual('"P00001";"Chicago"             ;"A";1.0;1.0;1.0;30;1.0;1.0;1.0;  30; 1; 0; 1;29;29;29;1;0;0;0;0;;  "F";stEOM');
   done();
 });
 
@@ -356,6 +348,49 @@ it('testGetMaxPrim', done => {
   expect(Helpers.getMaxPrimes(14)).toEqual(7);
   done();
 });
+
+
+it('testSplitLine', done => {
+  expect(Helpers.isDateLine('0123')).toEqual(false);
+  expect(Helpers.isLineStartingWithDigit('1123')).toEqual(true);
+  expect(Helpers.isLineStartingWithDigit('AB')).toEqual(false);
+  expect(Helpers.isLineStartingWithDigit('#')).toEqual(false);
+  expect(Helpers.isLineStartingWithDigit('1123')).toEqual(true);
+  done();
+});
+
+it('testReIndexTime', done => {
+  Helpers.reIndexTime('input/MONAG_SAMPLE_EASTBU.S.csv', 'testData/reindex.csv.tmp', function() {
+    {
+      var expDim = readFromFile('testData/reindex.csv') + '';
+      var actDim = readFromFile('testData/reindex.csv.tmp') + '';
+      expect(actDim.replace(/\r\n/g,"\n")).toEqual(expDim);
+    }
+    done();
+  });
+});
+
+
+it('testReIndexSAmles', done => {
+  var nr = 0;
+  ParseArgs.getInputSamples().forEach( s => {
+    Helpers.reIndexTime('input/MONAG_SAMPLE_' + s + '.S.csv', 'testData/MONAG_SAMPLE_' + s + '.S.csv.tmp', function() {
+      ++nr;
+      if ( nr == 8 ) {
+        done();
+      }
+    });
+    Helpers.reIndexTime('input/RANGE_SAMPLE_' + s + '.S.csv', 'testData/RANGE_SAMPLE_' + s + '.S.csv', function() {
+      ++nr;
+      if ( nr == 8 ) {
+        done();
+      }
+    });
+  });
+});
+
+
+
 
 it('testGenHierarchy', done => {
   var ws = fakeWS();
