@@ -1,8 +1,8 @@
 node js\index.js -n 3 -s -u -i -a
 node js\index.js -n 100 -s -u -i -a
+node js\index.js -n 1000 -s -u -i -a
 node js\index.js -n 3 -s -u
 node js\index.js -n 100 -s -u
-node js\index.js -n 100 -s -a -u
 node js\index.js -n 200 -s -u
 node js\index.js -n 500 -s -u
 node js\index.js -n 1000 -s -u
